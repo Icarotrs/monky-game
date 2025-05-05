@@ -1,0 +1,141 @@
+[gd_scene load_steps=18 format=3 uid="uid://0wcr6co525xh"]
+
+[ext_resource type="PackedScene" uid="uid://c8axwcklru5ec" path="res://Scenes/player.tscn" id="2_bo1nx"]
+[ext_resource type="Material" uid="uid://bb43ngplsfis2" path="res://addons/flexible_toon_shader/FlexibleToonMaterial.tres" id="2_jjvhh"]
+[ext_resource type="Script" uid="uid://bnjjh3pweeiyk" path="res://Scripts/camera_anchor.gd" id="3_8gbba"]
+[ext_resource type="Shader" uid="uid://cc0q4uycluekj" path="res://Scenes/outline.gdshader" id="3_kry3j"]
+[ext_resource type="Texture2D" uid="uid://bn8wfhbs1omgo" path="res://assets/textures/grids/Dark/texture_08.png" id="4_21xkr"]
+[ext_resource type="Texture2D" uid="uid://cucgybt6ybemg" path="res://assets/textures/grids/Orange/texture_01.png" id="6_6bp64"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_21xkr"]
+render_priority = 0
+shader = ExtResource("3_kry3j")
+shader_parameter/sensitivity = 1.0
+shader_parameter/outline_thickness = 2.0
+shader_parameter/step_threshold = 1.0
+shader_parameter/outline_color = Color(0, 0, 0, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_21xkr"]
+material = SubResource("ShaderMaterial_21xkr")
+flip_faces = true
+size = Vector2(2, 2)
+
+[sub_resource type="QuadMesh" id="QuadMesh_kry3j"]
+material = ExtResource("2_jjvhh")
+flip_faces = true
+size = Vector2(2, 2)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_jjgbg"]
+vertices = PackedVector3Array(-499.5, -0.48, -499.5, -499.5, -0.48, 499.5, 499.5, -0.48, 499.5, 499.5, -0.48, -499.5)
+polygons = [PackedInt32Array(3, 2, 0), PackedInt32Array(0, 2, 1)]
+cell_height = 0.01
+border_size = 0.25
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bo1nx"]
+albedo_texture = ExtResource("4_21xkr")
+uv1_triplanar = true
+
+[sub_resource type="BoxMesh" id="BoxMesh_8gbba"]
+lightmap_size_hint = Vector2i(10004, 5016)
+material = SubResource("StandardMaterial3D_bo1nx")
+size = Vector3(1000, 1, 1000)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jjgbg"]
+size = Vector3(1000, 1, 1000)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_344ge"]
+render_priority = 1
+albedo_texture = ExtResource("6_6bp64")
+uv1_triplanar = true
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_kry3j"]
+sky_top_color = Color(0, 0.436651, 0.856623, 1)
+sky_horizon_color = Color(0.60662, 0.780224, 0.926334, 1)
+ground_bottom_color = Color(0.426478, 0.684244, 0.848712, 1)
+ground_horizon_color = Color(0.60662, 0.780224, 0.926334, 1)
+
+[sub_resource type="Sky" id="Sky_bm1ch"]
+sky_material = SubResource("ProceduralSkyMaterial_kry3j")
+
+[sub_resource type="Environment" id="Environment_21xkr"]
+background_mode = 2
+sky = SubResource("Sky_bm1ch")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+reflected_light_source = 1
+fog_light_color = Color(0.776403, 0.798429, 0.833043, 1)
+fog_light_energy = 1.44
+fog_density = 0.0311
+fog_sky_affect = 0.669
+
+[node name="World" type="Node3D"]
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="."]
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+stretch_shrink = 2
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
+handle_input_locally = false
+size = Vector2i(576, 324)
+render_target_update_mode = 4
+
+[node name="CameraAnchor" type="Node3D" parent="SubViewportContainer/SubViewport"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+script = ExtResource("3_8gbba")
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport/CameraAnchor"]
+transform = Transform3D(0.707107, -0.353553, 0.612373, 0, 0.866026, 0.5, -0.707107, -0.353553, 0.612373, 12.3208, 10.9474, 12.3208)
+projection = 1
+current = true
+size = 8.0
+
+[node name="Outline" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/CameraAnchor/Camera3D"]
+transform = Transform3D(1, 1.49012e-08, -2.98023e-08, 0, 1, 0, 0, 1.49012e-08, 1, 0.184, 0, 0)
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_21xkr")
+
+[node name="Toon" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/CameraAnchor/Camera3D"]
+transform = Transform3D(1, 1.49012e-08, -2.98023e-08, 0, 1, 0, 0, 1.49012e-08, 1, 0, 0, 0)
+extra_cull_margin = 16384.0
+mesh = SubResource("QuadMesh_kry3j")
+skeleton = NodePath("../Outline")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+navigation_mesh = SubResource("NavigationMesh_jjgbg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/NavigationRegion3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("BoxMesh_8gbba")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="SubViewportContainer/SubViewport/NavigationRegion3D/MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="SubViewportContainer/SubViewport/NavigationRegion3D/MeshInstance3D/StaticBody3D"]
+shape = SubResource("BoxShape3D_jjgbg")
+
+[node name="Player" parent="SubViewportContainer/SubViewport" instance=ExtResource("2_bo1nx")]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, -9)
+use_collision = true
+size = Vector3(7, 3, 7)
+material = SubResource("StandardMaterial3D_344ge")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="SubViewportContainer/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.2119, 1.5, -2.63013)
+use_collision = true
+size = Vector3(2.89886, 3, 5)
+material = SubResource("StandardMaterial3D_344ge")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_21xkr")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.956512, 0.289838, 0.0328292, 0.178688, -0.671185, 0.719432, 0.230553, -0.682278, -0.693787, 0.00134277, 8.3981, -0.109232)
+shadow_enabled = true
